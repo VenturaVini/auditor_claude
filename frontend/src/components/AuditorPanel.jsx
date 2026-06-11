@@ -3,11 +3,23 @@ import CodeRunner, { extractPythonCode } from './CodeRunner.jsx'
 import { modelLabel } from '../services/models.js'
 import ModelSelect from './ModelSelect.jsx'
 
-function AuditCard({ question, audit, pending, roundLabel, isBooster = false }) {
+const STATUS_ICON = { OK: '✓', REVIEW: '⚠', ERROR: '—' }
+
+function AuditCard({ question, audit, pending, roundLabel, isBooster = false, defaultOpen = true }) {
   return (
-    <div className={`audit-card ${isBooster ? 'booster-card' : ''}`}>
+    <details
+      className={`audit-card ${isBooster ? 'booster-card' : ''}`}
+      {...(defaultOpen || pending ? { open: true } : {})}
+    >
+      <summary className="audit-summary" title="Clique para minimizar/expandir">
+        <span className="audit-summary-label">{roundLabel || 'Auditoria'}</span>
+        {!pending && (
+          <span className={`audit-mini ${(audit.status || 'ERROR').toLowerCase()}`}>
+            {STATUS_ICON[audit.status] || '—'} {audit.status === 'OK' ? 'concordou' : audit.status === 'REVIEW' ? 'discordou' : 'indisponível'}
+          </span>
+        )}
+      </summary>
       {question && <div className="audit-question" title={question}>❝ {question}</div>}
-      {roundLabel && <div className="audit-round">{roundLabel}</div>}
       {pending ? (
         <div className="audit-waiting">Aguardando o Claude terminar para auditar…</div>
       ) : audit.status === 'OK' ? (
@@ -26,7 +38,7 @@ function AuditCard({ question, audit, pending, roundLabel, isBooster = false }) 
           <div className="audit-comment">{audit.comment}</div>
           {audit.response && (
             <div className="audit-response message-content">
-              <Markdown>{audit.response}</Markdown>
+              <Markdown collapseCode>{audit.response}</Markdown>
               {(() => {
                 const code = extractPythonCode(audit.response)
                 return code ? <CodeRunner code={code} /> : null
@@ -48,7 +60,7 @@ function AuditCard({ question, audit, pending, roundLabel, isBooster = false }) 
           )}
         </div>
       )}
-    </div>
+    </details>
   )
 }
 
@@ -101,6 +113,7 @@ export default function AuditorPanel({
                     audit={d.audit || {}}
                     pending={false}
                     roundLabel={`Rodada ${d.round}/${d.total} — crítica intermediária`}
+                    defaultOpen={false}
                   />
                 ))}
                 <AuditCard

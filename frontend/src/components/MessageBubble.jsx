@@ -11,7 +11,7 @@ import { modelLabel } from '../services/models.js'
 
 const FILE_MARKER = '# gerar-arquivo'
 
-export function Markdown({ children }) {
+export function Markdown({ children, collapseCode = false }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -20,11 +20,13 @@ export function Markdown({ children }) {
           const match = /language-(\w+)/.exec(className || '')
           if (!inline && match) {
             const text = String(code).replace(/\n$/, '')
-            // Código de geração de arquivo: fica recolhido (o sistema já executou)
-            if (text.trimStart().startsWith(FILE_MARKER)) {
+            // Recolhe: código de geração de arquivo (já executado pelo sistema)
+            // ou QUALQUER código quando collapseCode (painel do auditor/booster —
+            // mostra só o texto; código apenas se o usuário expandir)
+            if (collapseCode || text.trimStart().startsWith(FILE_MARKER)) {
               return (
                 <details className="code-collapse">
-                  <summary>Ver código usado para gerar o arquivo</summary>
+                  <summary>Ver código</summary>
                   <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div">
                     {text}
                   </SyntaxHighlighter>

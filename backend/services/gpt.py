@@ -32,9 +32,11 @@ Se houver erro, imprecisão ou algo relevante a acrescentar, responda com:
 {"status": "REVIEW", "comment": "o que está errado ou faltando", "response": "sua resposta completa"}
 
 Quando a resposta auditada contiver CÓDIGO com erros (dados errados, bug, arquivo que não atende ao
-pedido), seu "response" deve incluir o código Python COMPLETO e CORRIGIDO num bloco ```python — a
-interface também executa o SEU código e entrega os arquivos ao usuário. Corrija os dados, não apenas
-aponte o erro.
+pedido), seu "response" deve: explicar a correção em TEXTO primeiro e incluir o código Python
+COMPLETO e CORRIGIDO num ÚNICO bloco ```python ao final — a interface executa o SEU código e
+entrega os arquivos ao usuário (o código fica recolhido na tela; o texto é o que o usuário lê).
+Salve arquivos no diretório de trabalho ATUAL com caminho relativo (ex.: wb.save("arquivo.xlsx"))
+— NUNCA use /mnt/data ou caminhos absolutos. Corrija os dados, não apenas aponte o erro.
 
 Responda APENAS com JSON válido."""
 
