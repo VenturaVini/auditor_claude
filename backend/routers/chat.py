@@ -320,17 +320,30 @@ async def chat(req: ChatRequest):
                     round_infos.append(r_info)
                 k += 2
         else:
-            # GPT respondeu (Anthropic caiu) — sem debate; Claude tenta auditar
+            # GPT respondeu (Anthropic caiu) — sem debate. Auditoria: tenta Claude;
+            # se a Anthropic seguir fora, SEGUNDA OPINIÃO com OUTRO modelo da OpenAI
+            # (o app continua auditado mesmo 100% sem Anthropic, ex.: limite mensal).
             try:
                 audit = await claude_svc.audit_with_claude(audit_question, answer, main_model)
                 audit["via"] = f"{main_model} (auditando resposta do GPT)"
             except Exception as e:
-                audit = {
-                    "status": "ERROR",
-                    "comment": f"Sem auditoria: a API da Anthropic segue indisponível ({e})",
-                }
+                second = next(
+                    (m for m in ("gpt-5.4", "gpt-4o", "gpt-5-mini", "gpt-4o-mini") if m != auditor_model),
+                    "gpt-4o",
+                )
+                try:
+                    audit = await gpt_svc.audit_response(audit_question, answer, second)
+                    audit["via"] = f"{second} (segunda opinião OpenAI — Anthropic indisponível)"
+                except Exception as e2:
+                    audit = {
+                        "status": "ERROR",
+                        "comment": (
+                            f"Sem auditoria: Anthropic indisponível ({e}) e a segunda "
+                            f"opinião OpenAI também falhou ({e2})"
+                        ),
+                    }
             audit["round"] = 2
-            audit["total"] = rounds
+            audit["total"] = 2  # no failover o debate colapsa — não exibir "2/8"
 
         # ===== Métricas somadas de todas as rodadas (modelo, tokens, tempo, custo) =====
         t_end = time.monotonic()
