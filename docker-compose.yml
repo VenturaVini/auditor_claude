@@ -1,0 +1,53 @@
+services:
+  api:
+    build: ./backend
+    ports: ["${API_PORT:-8101}:8000"]
+    env_file:
+      # opcional: sem .env os containers sobem e o chat mostra erro claro de chave
+      - path: .env
+        required: false
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    volumes: ["uploads-data:/tmp/uploads"]
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: ["redis-data:/data"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Vite embute env vars no build — alterar exige rebuild (docker compose build web)
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8101}
+    ports: ["${WEB_PORT:-8100}:80"]
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis-data:
+  uploads-data:

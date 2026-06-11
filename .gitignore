@@ -1,0 +1,17 @@
+# Segredos — NUNCA commitar
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/
+dist/
+
+# SO / IDE
+.DS_Store
+.idea/
+.vscode/
+.claude/
