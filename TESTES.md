@@ -85,6 +85,19 @@
 3. Correções desta fase: MAX_TOKENS 8K→32K; fórmulas Excel em inglês obrigatórias no prompt; auto-fix de código agora usa o MESMO modelo da conversa; acentos reforçados no prompt (inclusive MAIÚSCULAS); stderr da retentativa de auto-fix agora é exposto.
 4. UI: booster com visual corporativo ("Parecer final independente · Claude Opus 4.8", dourado sóbrio) e seletor "2x rodadas (Padrão)".
 
+## Fase 10 — Debate 8x completo (pergunta financeira extrema) + git + máquina nova (11/06/2026)
+| # | Teste | Resultado | Status |
+|---|---|---|---|
+| 10.1 | Máquina nova real (wipe volumes+imagens → `up --build -d`) | 3 healthy; smoke do pipeline inteiro PASS (chat+arquivo+audit+métricas) — só o .env é necessário | ✅ |
+| 10.2 | Segurança pré-git: varredura byte a byte | chaves SÓ no .env (gitignored); .claude/ excluído | ✅ |
+| 10.3 | Push p/ github.com/VenturaVini/auditor_claude | main publicada (44 arquivos) + commit do caso de debate | ✅ |
+| 10.4 | Envio de documentos pós-rebuild | .md e PDF multi-página: upload, extração e leitura no contexto corretos | ✅ |
+| 10.5 | **DEBATE 8x** (CDB 110% × LCI 92% × fundo c/ come-cotas, 24m) | **8/8 rodadas, 4 intervenções de cada**; críticas EVOLUÍRAM: r2 conversão de taxas, r4 conceito do come-cotas (maio/nov, não no resgate), r6 sutileza tributária (720 dias exatos = 17,5%, não 15%), r8 sinal da taxa adm; boosters: opus validou o CDB por logaritmo, gpt-5.5 achou bug td() no código do PDF | ✅ |
+| 10.6 | Verificação exata do 8x | conclusão CORRETA (CDB vence LCI por ~R$1,4k); números a 0,015-0,03% do exato (drift residual de potência persiste mesmo após 4 refinos) | ⚠️ |
+| 10.7 | Custo do 8x | **~$0,76 só no lado Sonnet** (49k in/41k out, 14min) — pergunta pesada em 8x ULTRAPASSA o teto de $0,40/teste; usar 8x só para casos que valem o investimento | ⚠️ |
+
+**Arquivo para debates manuais:** `CASO_DEBATE_FINANCAS.md` (Família Andrade — quitação×investimentos×reforma, 5 perguntas + armadilhas) — anexar no chat com 8x + booster.
+
 ## Como repetir a campanha
 Os comandos desta campanha estão no histórico da sessão de Claude (CONTEXT.md aponta os destaques).
 Atalhos úteis: forçar debate → pergunta de cálculo com arredondamento (Tabela Price); forçar parada
